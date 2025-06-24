@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Filtro de Plantas 🌳</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #ecfdf5;
+      --bg-card: #fff;
+      --text: #174f2c;
+      --card-shadow: 0 4px 16px #b7e3d3cc;
+      --primary: #2aad6d;
+      --input-bg: #f2fff8;
+      --border: #81c784;
+      --btn-bg: #13b574;
+      --btn-text: #fff;
+    }
+    [data-theme='dark'] {
+      --bg: #141c18;
+      --bg-card: #1a2521;
+      --text: #f3fcf6;
+      --card-shadow: 0 6px 22px #11291b80;
+      --primary: #2be681;
+      --input-bg: #192821;
+      --border: #2be681;
+      --btn-bg: #034527;
+      --btn-text: #bafecc;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      transition: background .23s, color .23s;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 42px auto;
+      background: var(--bg-card);
+      border-radius: 17px;
+      box-shadow: var(--card-shadow);
+      padding: 32px 20px 20px 20px;
+      transition: background .23s;
+    }
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 10px;
+      letter-spacing: 0.01em;
+      font-weight: 800;
+      font-size: 2.15rem;
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filters input,
+    .filters select {
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      padding: 9px 11px;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border .18s, background .19s, color .19s;
+      outline: none;
+      min-width: 125px;
+    }
+    .filters input:focus,
+    .filters select:focus {
+      border: 2px solid var(--primary);
+    }
+    .theme-toggle {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: none;
+      padding: 9px 19px 9px 14px;
+      min-width: 105px;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin-left: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #14b57429;
+      display: flex;
+      align-items: center;
+      transition: background .18s, color .18s;
+    }
+    .theme-toggle span {
+      font-size: 1.15em;
+      margin-left: 8px;
+    }
+    .planta-lista {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--bg-card);
+      color: var(--text);
+      border-radius: 10px;
+      box-shadow: 0 2px 16px #2aad6d2a;
+      padding: 23px 16px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: box-shadow .17s, background .18s, color .17s;
+      min-height: 144px;
+    }
+    .card:hover {
+      box-shadow: 0 7px 22px #2aad6d31;
+      background: #f0f8f4;
+    }
+    [data-theme='dark'] .card:hover {
+      background: #22362d;
+    }
+    .card h2 {
+      margin: 0 0 3px 0;
+      font-size: 1.09em;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .card p {
+      margin: 2px 0 0 0;
+      font-size: .98em;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 9vw 2vw;
+      }
+      .planta-lista { gap: 11px; }
+      h1 { font-size: 1.2em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Filtro de Plantas 🌳</h1>
+    <form id="filtros" class="filters" autocomplete="off">
+      <input type="text" id="nome" placeholder="Nome">
+      <select id="tipo">
+        <option value="">Tipo</option>
+        <option value="ornamental">Ornamental</option>
+        <option value="erva">Erva</option>
+        <option value="flor">Flor</option>
+        <option value="cactos">Cactos</option>
+        <option value="árvore">Árvore</option>
+        <option value="frutífera">Frutífera</option>
+        <option value="folhagem">Folhagem</option>
+      </select>
+      <select id="luz">
+        <option value="">Luz</option>
+        <option value="interna">Interna</option>
+        <option value="externa">Externa</option>
+      </select>
+      <input type="number" id="regas" placeholder="Regas/dia" min="0">
+      <button type="button" class="theme-toggle" id="theme-toggle">Modo <span id="theme-icon">🌙</span></button>
+    </form>
+
+    <div class="planta-lista" id="planta-lista"></div>
+  </div>
+
+  <script>
+    // 50 plantas diferentes!
+    const plantas = [
+      { nome: "Espada-de-São-Jorge", tipo: "ornamental", luz: "interna", regas: 1 },
+      { nome: "Samambaia", tipo: "folhagem", luz: "interna", regas: 2 },
+      { nome: "Manjericão", tipo: "erva", luz: "externa", regas: 1 },
+      { nome: "Lírio-da-Paz", tipo: "ornamental", luz: "interna", regas: 1 },
+      { nome: "Lavanda", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Cacto", tipo: "cactos", luz: "interna", regas: 0 },
+      { nome: "Ficus", tipo: "árvore", luz: "interna", regas: 1 },
+      { nome: "Jasmim", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Orquídea", tipo: "flor", luz: "interna", regas: 1 },
+      { nome: "Alecrim", tipo: "erva", luz: "externa", regas: 1 },
+      { nome: "Bromélia", tipo: "ornamental", luz: "interna", regas: 1 },
+      { nome: "Suculenta", tipo: "cactos", luz: "interna", regas: 0 },
+      { nome: "Hortelã", tipo: "erva", luz: "externa", regas: 1 },
+      { nome: "Antúrio", tipo: "flor", luz: "interna", regas: 1 },
+      { nome: "Costela-de-Adão", tipo: "folhagem", luz: "interna", regas: 1 },
+      { nome: "Zamioculca", tipo: "ornamental", luz: "interna", regas: 1 },
+      { nome: "Jiboia", tipo: "folhagem", luz: "interna", regas: 1 },
+      { nome: "Peperômia", tipo: "folhagem", luz: "interna", regas: 1 },
+      { nome: "Pata-de-elefante", tipo: "ornamental", luz: "externa", regas: 1 },
+      { nome: "Begônia", tipo: "flor", luz: "interna", regas: 1 },
+      { nome: "Gardênia", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Tomilho", tipo: "erva", luz: "externa", regas: 1 },
+      { nome: "Louro", tipo: "árvore", luz: "externa", regas: 1 },
+      { nome: "Pitanga", tipo: "frutífera", luz: "externa", regas: 1 },
+      { nome: "Aroeira", tipo: "árvore", luz: "externa", regas: 1 },
+      { nome: "Amor-perfeito", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Bananeira", tipo: "frutífera", luz: "externa", regas: 1 },
+      { nome: "Pimenteira", tipo: "frutífera", luz: "externa", regas: 1 },
+      { nome: "Salvia", tipo: "erva", luz: "externa", regas: 1 },
+      { nome: "Erva-doce", tipo: "erva", luz: "externa", regas: 1 },
+      { nome: "Camomila", tipo: "erva", luz: "externa", regas: 1 },
+      { nome: "Azaleia", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Amarílis", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Palmeira", tipo: "ornamental", luz: "externa", regas: 1 },
+      { nome: "Violeta", tipo: "flor", luz: "interna", regas: 2 },
+      { nome: "Camedórea", tipo: "folhagem", luz: "interna", regas: 1 },
+      { nome: "Araucária", tipo: "árvore", luz: "externa", regas: 1 },
+      { nome: "Mamoeiro", tipo: "frutífera", luz: "externa", regas: 1 },
+      { nome: "Ipê-amarelo", tipo: "árvore", luz: "externa", regas: 1 },
+      { nome: "Bougainville", tipo: "ornamental", luz: "externa", regas: 1 },
+      { nome: "Goiabeira", tipo: "frutífera", luz: "externa", regas: 1 },
+      { nome: "Boldo", tipo: "erva", luz: "externa", regas: 1 },
+      { nome: "Jabuticabeira", tipo: "frutífera", luz: "externa", regas: 1 },
+      { nome: "Dama-da-noite", tipo: "ornamental", luz: "externa", regas: 1 },
+      { nome: "Primavera", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Clúsia", tipo: "ornamental", luz: "externa", regas: 1 },
+      { nome: "Rosa", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Abacateiro", tipo: "frutífera", luz: "externa", regas: 1 },
+      { nome: "Cactos-mickey", tipo: "cactos", luz: "interna", regas: 0 },
+      { nome: "Calêndula", tipo: "flor", luz: "externa", regas: 1 },
+      { nome: "Pilea", tipo: "folhagem", luz: "interna", regas: 1 }
+    ];
+
+    function cardHtml(planta) {
+      return `
+      <div class="card">
+        <h2>${planta.nome}</h2>
+        <p>Tipo: ${planta.tipo.charAt(0).toUpperCase() + planta.tipo.slice(1)}</p>
+        <p>Luz: ${planta.luz.charAt(0).toUpperCase() + planta.luz.slice(1)}</p>
+        <p>Regas/dia: ${planta.regas}</p>
+      </div>`;
+    }
+
+    function renderPlantas(lista) {
+      const container = document.getElementById("planta-lista");
+      container.innerHTML = lista.length
+        ? lista.map(cardHtml).join('')
+        : `<p style="grid-column:1/-1;color:var(--primary);font-weight:500">Nenhuma planta encontrada 😢</p>`;
+    }
+
+    function filtrarPlantas() {
+      const nomeF = document.getElementById('nome').value.trim().toLowerCase();
+      const tipoF = document.getElementById('tipo').value;
+      const luzF = document.getElementById('luz').value;
+      const regasF = document.getElementById('regas').value;
+      const resultado = plantas.filter(planta =>
+        (!nomeF     || planta.nome.toLowerCase().includes(nomeF)) &&
+        (!tipoF     || planta.tipo === tipoF) &&
+        (!luzF      || planta.luz === luzF) &&
+        (!regasF    || planta.regas === Number(regasF))
+      );
+      renderPlantas(resultado);
+    }
+
+    // Modo escuro (toggle)
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('plant_theme', theme);
+    }
+    themeToggle.onclick = () => {
+      const atual = document.documentElement.getAttribute('data-theme');
+      setTheme(atual === 'dark' ? '' : 'dark');
+    };
+    // Inicializa tema salvo
+    (function () {
+      const saved = localStorage.getItem('plant_theme');
+      if (saved) setTheme(saved);
+    })();
+
+    document.getElementById('filtros').addEventListener('input', filtrarPlantas);
+    renderPlantas(plantas);
+  </script>
+</body>
+</html>
